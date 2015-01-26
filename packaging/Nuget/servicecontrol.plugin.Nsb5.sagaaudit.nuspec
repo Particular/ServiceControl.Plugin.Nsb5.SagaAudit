@@ -19,7 +19,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="..\..\src\ServiceControl.Plugin.SagaAudit\bin\release\ServiceControl.Plugin.Nsb5.SagaAudit.*" target="lib\net45" />
-    <file src="..\Nuget\tools\install.ps1" target="tools" />
+    <file src="..\..\src\ServiceControl.Plugin.Nsb5.SagaAudit\bin\release\ServiceControl.Plugin.Nsb5.SagaAudit.*" target="lib\net45" />
   </files>
 </package>
