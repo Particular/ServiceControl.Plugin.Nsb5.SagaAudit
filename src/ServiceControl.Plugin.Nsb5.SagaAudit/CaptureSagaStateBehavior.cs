@@ -1,6 +1,8 @@
 ﻿namespace ServiceControl.Plugin.SagaAudit
 {
     using System;
+    using System.Collections.Generic;
+    using System.Runtime.Remoting.Messaging;
     using EndpointPlugin.Messages.SagaState;
     using NServiceBus;
     using NServiceBus.Pipeline;
@@ -60,22 +62,10 @@
 
             var activeSagaInstance = context.Get<ActiveSagaInstance>();
             var sagaStateString = Serializer.Serialize(saga.Entity);
+            var messageType = context.IncomingLogicalMessage.MessageType.FullName;
             var headers = context.IncomingLogicalMessage.Headers;
-            var originatingMachine = headers["NServiceBus.OriginatingMachine"];
-            var originatingEndpoint = headers[Headers.OriginatingEndpoint];
-            var timeSent = DateTimeExtensions.ToUtcDateTime(headers[Headers.TimeSent]);
-            var intent = headers.ContainsKey(Headers.MessageIntent) ? headers[Headers.MessageIntent] : "Send"; // Just in case the received message is from an early version that does not have intent, should be a rare occasion.
 
-            sagaAudit.Initiator = new SagaChangeInitiator
-                {
-                    IsSagaTimeoutMessage = IsTimeoutMessage(context.IncomingLogicalMessage),
-                    InitiatingMessageId = messageId,
-                    OriginatingMachine = originatingMachine,
-                    OriginatingEndpoint = originatingEndpoint,
-                    MessageType = context.IncomingLogicalMessage.MessageType.FullName,
-                    TimeSent = timeSent,
-                    Intent = intent
-                };
+            sagaAudit.Initiator = BuildSagaChangeInitatorMessage(headers, messageId, messageType);
             sagaAudit.IsNew = activeSagaInstance.IsNew;
             sagaAudit.IsCompleted = saga.Completed;
             sagaAudit.Endpoint = configure.Settings.EndpointName();
@@ -87,6 +77,38 @@
 
             var backend = new ServiceControlBackend(sendMessages, configure, criticalError);
             backend.Send(sagaAudit);
+        }
+
+        public SagaChangeInitiator BuildSagaChangeInitatorMessage(Dictionary<string, string> headers, string messageId, string messageType )
+        {
+
+            string originatingMachine;
+            headers.TryGetValue(Headers.OriginatingMachine, out originatingMachine);
+
+            string originatingEndpoint;
+            headers.TryGetValue(Headers.OriginatingEndpoint, out originatingEndpoint);
+
+            string timeSent;
+            var timeSentConveredToUtc = headers.TryGetValue(Headers.TimeSent, out timeSent) ?
+                DateTimeExtensions.ToUtcDateTime(timeSent) :
+                DateTime.MinValue;
+
+            string messageIntent;
+            var intent = headers.TryGetValue(Headers.MessageIntent, out messageIntent) ? messageIntent : "Send"; // Just in case the received message is from an early version that does not have intent, should be a rare occasion.
+
+            string isTimeout;
+            var isTimeoutMessage = headers.TryGetValue(Headers.IsSagaTimeoutMessage, out isTimeout) && isTimeout.ToLowerInvariant() == "true";
+
+            return new SagaChangeInitiator
+                {
+                    IsSagaTimeoutMessage = isTimeoutMessage,
+                    InitiatingMessageId = messageId,
+                    OriginatingMachine = originatingMachine,
+                    OriginatingEndpoint = originatingEndpoint,
+                    MessageType = messageType,
+                    TimeSent = timeSentConveredToUtc,
+                    Intent = intent
+                };
         }
 
         void AssignSagaStateChangeCausedByMessage(IncomingContext context)
@@ -115,16 +137,6 @@
             sagaStateChange += String.Format("{0}:{1}", sagaAudit.SagaId, statechange);
 
             context.PhysicalMessage.Headers["ServiceControl.SagaStateChange"] = sagaStateChange;
-        }
-
-        static bool IsTimeoutMessage(LogicalMessage message)
-        {
-            string isTimeoutString;
-            if (message.Headers.TryGetValue(Headers.IsSagaTimeoutMessage, out isTimeoutString))
-            {
-                return isTimeoutString.ToLowerInvariant() == "true";
-            }
-            return false;
         }
 
         SagaUpdatedMessage sagaAudit;
