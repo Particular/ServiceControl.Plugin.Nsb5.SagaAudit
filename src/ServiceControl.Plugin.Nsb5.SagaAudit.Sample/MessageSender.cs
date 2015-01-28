@@ -9,10 +9,14 @@ namespace Server
 
         public void Start()
         {
-            Bus.SendLocal(new Message1
+            Console.WriteLine("Press Enter to start a saga");
+            while (Console.ReadLine() != null)
+            {
+                Bus.SendLocal(new Message1
                 {
                     SomeId = Guid.NewGuid()
                 });
+            }
         }
 
         public void Stop()
