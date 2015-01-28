@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Runtime.Remoting.Messaging;
     using EndpointPlugin.Messages.SagaState;
     using NServiceBus;
     using NServiceBus.Pipeline;
@@ -10,7 +9,6 @@
     using NServiceBus.Saga;
     using NServiceBus.Sagas;
     using NServiceBus.Transports;
-    using NServiceBus.Unicast.Messages;
 
     class CaptureSagaStateBehavior : IBehavior<IncomingContext>
     {

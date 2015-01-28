@@ -13,7 +13,7 @@
             var behavior = new CaptureSagaStateBehavior(null, null, null);
           
 
-            var headers = new Dictionary<string, string>()
+            var headers = new Dictionary<string, string>
             {
                 {"NServiceBus.MessageId", "cf79765e-0123-45bf-a41b-a42d00a867c9"},
                 {"NServiceBus.CorrelationId", "cf79765e-0123-45bf-a41b-a42d00a867c9"},
