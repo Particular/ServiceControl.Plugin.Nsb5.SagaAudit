@@ -10,7 +10,7 @@
         [Test]
         public void Saga_state_change_message_can_be_created()
         {
-            var behavior = new CaptureSagaStateBehavior(null, null, null);
+            var behavior = new CaptureSagaStateBehavior(null, null);
           
 
             var headers = new Dictionary<string, string>
