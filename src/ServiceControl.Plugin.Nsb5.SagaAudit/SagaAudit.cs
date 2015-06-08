@@ -1,8 +1,10 @@
 ﻿namespace ServiceControl.Features
 {
+    using NServiceBus;
     using NServiceBus.Features;
     using NServiceBus.Pipeline;
     using Plugin.SagaAudit;
+    using ServiceControl.Plugin;
 
     public class SagaAudit : Feature
     {
@@ -14,6 +16,8 @@
         
         protected override void Setup(FeatureConfigurationContext context)
         {
+            context.Container.ConfigureComponent<ServiceControlBackend>(DependencyLifecycle.SingleInstance);
+
             context.Pipeline.Register<CaptureSagaStateRegistration>();
             context.Pipeline.Register<CaptureSagaResultingMessageRegistration>();
         }

@@ -8,19 +8,17 @@
     using NServiceBus.Pipeline.Contexts;
     using NServiceBus.Saga;
     using NServiceBus.Sagas;
-    using NServiceBus.Transports;
 
     class CaptureSagaStateBehavior : IBehavior<IncomingContext>
     {
         Configure configure;
-        ISendMessages sendMessages;
-        readonly CriticalError criticalError;
+        SagaUpdatedMessage sagaAudit;
+        ServiceControlBackend backend;
 
-        public CaptureSagaStateBehavior(Configure configure, ISendMessages sendMessages, CriticalError criticalError)
+        public CaptureSagaStateBehavior(Configure configure, ServiceControlBackend backend)
         {
             this.configure = configure;
-            this.sendMessages = sendMessages;
-            this.criticalError = criticalError;
+            this.backend = backend;
         }
 
         public void Invoke(IncomingContext context, Action next)
@@ -72,8 +70,6 @@
             sagaAudit.SagaState = sagaStateString;
 
             AssignSagaStateChangeCausedByMessage(context);
-
-            var backend = new ServiceControlBackend(sendMessages, configure, criticalError);
             backend.Send(sagaAudit);
         }
 
@@ -137,6 +133,5 @@
             context.PhysicalMessage.Headers["ServiceControl.SagaStateChange"] = sagaStateChange;
         }
 
-        SagaUpdatedMessage sagaAudit;
     }
 }
