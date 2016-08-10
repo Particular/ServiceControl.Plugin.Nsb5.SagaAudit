@@ -36,7 +36,7 @@
             public CaptureSagaResultingMessageRegistration()
                 : base("ReportSagaStateChanges", typeof(CaptureSagaResultingMessagesBehavior), "Reports the saga state changes to ServiceControl")
             {
-                InsertAfter(WellKnownStep.InvokeSaga);
+                InsertBefore(WellKnownStep.DispatchMessageToTransport);
             }
         }
     }
