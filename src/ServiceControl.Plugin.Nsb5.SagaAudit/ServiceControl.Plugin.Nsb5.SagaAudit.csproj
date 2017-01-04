@@ -42,6 +42,10 @@
     <DocumentationFile>bin\Release\ServiceControl.Plugin.Nsb5.SagaAudit.xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="NServiceBus.Core, Version=5.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -71,6 +75,7 @@
     <Compile Include="VersionChecker.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="NServiceBus.snk" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
