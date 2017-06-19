@@ -11,7 +11,7 @@
         public void Saga_state_change_message_can_be_created()
         {
             var behavior = new CaptureSagaStateBehavior(null, null);
-          
+
 
             var headers = new Dictionary<string, string>
             {
@@ -42,10 +42,13 @@
             var message = behavior.BuildSagaChangeInitatorMessage(headers, messageId, messageType);
 
             Assert.IsNotNull(message);
-            Assert.IsNotNullOrEmpty(message.OriginatingEndpoint);
-            Assert.IsNotNullOrEmpty(message.OriginatingMachine);
+            Assert.IsNotNull(message.OriginatingEndpoint);
+            Assert.IsNotNull(message.OriginatingMachine);
+            Assert.IsNotEmpty(message.OriginatingEndpoint);
+            Assert.IsNotEmpty(message.OriginatingMachine);
             Assert.IsTrue(message.IsSagaTimeoutMessage);
-            Assert.AreNotEqual(DateTime.MinValue, message.TimeSent); // When SC can handle null TimeSent, then should be asserting to null, instead of checking for minValue
+            // When SC can handle null TimeSent, then should be asserting to null, instead of checking for minValue
+            Assert.AreNotEqual(DateTime.MinValue, message.TimeSent);
         }
     }
 }

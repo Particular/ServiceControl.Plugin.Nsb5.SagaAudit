@@ -8,8 +8,8 @@ public class MySaga : Saga<MySagaData>, IAmStartedByMessages<Message1>
     protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MySagaData> mapper)
     {
         mapper.ConfigureMapping<Message1>(s => s.SomeId)
-           .ToSaga(m => m.SomeId);
-        }
+            .ToSaga(m => m.SomeId);
+    }
 
     public void Handle(Message1 message)
     {

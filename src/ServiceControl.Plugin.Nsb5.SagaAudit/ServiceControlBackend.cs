@@ -70,7 +70,7 @@
             catch (Exception ex)
             {
                 circuitBreaker.Failure(ex);
-            }            
+            }
         }
 
         public void Send(object messageToSend)
@@ -80,7 +80,7 @@
 
         Address GetServiceControlAddress()
         {
-            var queueName = ConfigurationManager.AppSettings[@"ServiceControl/Queue"];
+            var queueName = ConfigurationManager.AppSettings["ServiceControl/Queue"];
             if (!String.IsNullOrEmpty(queueName))
             {
                 return Address.Parse(queueName);
@@ -88,7 +88,7 @@
 
             Address errorAddress;
             if (TryGetErrorQueueAddress(out errorAddress))
-            { 
+            {
                 return new Address("Particular.ServiceControl", errorAddress.Machine);
             }
 
@@ -135,9 +135,9 @@
         {
             try
             {
-                // In order to verify if the queue exists, we are sending a control message to SC. 
+                // In order to verify if the queue exists, we are sending a control message to SC.
                 // If we are unable to send a message because the queue doesn't exist, then we can fail fast.
-                // We currently don't have a way to check if Queue exists in a transport agnostic way, 
+                // We currently don't have a way to check if Queue exists in a transport agnostic way,
                 // hence the send.
                 messageSender.Send(ControlMessage.Create(), new SendOptions(serviceControlBackendAddress) { ReplyToAddress = configure.LocalAddress });
             }
